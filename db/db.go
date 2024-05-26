@@ -3,14 +3,14 @@ package db
 import (
 	"database/sql"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
 
 func InitDB() {
 	var err error
-	DB, err = sql.Open("sqlite3", "api.db")
+	DB, err = sql.Open("postgres", "user=postgres password=joao2304 dbname=event_booking_database sslmode=disable")
 
 	if err != nil {
 		panic("Could not connect to database.")
@@ -24,20 +24,14 @@ func InitDB() {
 
 func createTables() {
 	createEventsTable := `
-	CREATE TABLE IF NOT EXISTS events (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL,
-		description TEXT NOT NULL,
-		location TEXT NOT NULL,
-		dateTime DATETIME NOT NULL,
-		user_id INTEGER
-	)
-	`
-
-	_, err := DB.Exec(createEventsTable)
-
-	if err != nil {
-		panic(err)
-	}
-
+    CREATE TABLE IF NOT EXISTS events (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        location TEXT NOT NULL,
+        date_time TIMESTAMP NOT NULL,
+        user_id INTEGER
+    )
+    `
+	DB.Exec(createEventsTable)
 }
