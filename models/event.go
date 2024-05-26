@@ -16,20 +16,6 @@ type Event struct {
 
 var events = []Event{}
 
-func (e *Event) Save() error {
-	events = append(events, *e)
-	query := `
-    INSERT INTO events(name, description, location, date_time, user_id)
-    VALUES ($1, $2, $3, $4, $5) RETURNING id`
-
-	err := db.DB.QueryRow(query, e.Name, e.Description, e.Location, e.DateTime, e.UserID).Scan(&e.ID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func GetAllEvents() ([]Event, error) {
 	query := "SELECT * FROM events"
 
@@ -65,4 +51,34 @@ func GetEvenByID(id int64) (*Event, error) {
 	}
 
 	return &event, nil
+}
+
+func (e *Event) Save() error {
+	events = append(events, *e)
+	query := `
+	INSERT INTO events(name, description, location, date_time, user_id)
+	VALUES ($1, $2, $3, $4, $5) RETURNING id`
+
+	err := db.DB.QueryRow(query, e.Name, e.Description, e.Location, e.DateTime, e.UserID).Scan(&e.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *Event) Update() error {
+	query := `
+	UPDATE events
+	SET name = $1, description = $2, location = $3, date_time = $4
+	WHERE id = $5
+	`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.ID)
+	return err
 }

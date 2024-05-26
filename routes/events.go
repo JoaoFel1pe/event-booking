@@ -61,7 +61,7 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEvenByID()
+	_, err = models.GetEvenByID(eventID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "could not fetch the event"})
 		return
@@ -74,4 +74,13 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
+	updatedEvent.ID = eventID
+
+	err = updatedEvent.Update()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "could not update event. try again later"})
+		return
+	}
+
+	context.JSON(http.StatusCreated, gin.H{"message": "event updated successfully"})
 }
