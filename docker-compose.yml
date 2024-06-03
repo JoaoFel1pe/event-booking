@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: joao2304
-      POSTGRES_DB: event_booking_database
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
@@ -16,9 +16,14 @@ services:
     build: .
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
       DB_HOST: db
       DB_PORT: "5432"
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
     ports:
       - "8080:8080"
     volumes:
