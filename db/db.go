@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -10,7 +12,13 @@ var DB *sql.DB
 
 func InitDB() {
 	var err error
-	DB, err = sql.Open("postgres", "user=postgres password=joao2304 dbname=event_booking_database sslmode=disable")
+	DB_HOST := os.Getenv("DB_HOST")
+	DB_PORT := os.Getenv("DB_PORT")
+	DB_USER := os.Getenv("DB_USER")
+	DB_PASS := os.Getenv("DB_PASS")
+	DB_NAME := os.Getenv("DB_NAME")
+
+	DB, err = sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME))
 
 	if err != nil {
 		panic("Could not connect to database.")
@@ -58,7 +66,7 @@ func createTables() {
         event_id INTEGER,
 		user_id INTEGER,
 		FOREIGN KEY (event_id) REFERENCES events(id),
-		FOREIGN KEY (users) REFERENCES users(id),
+		FOREIGN KEY (user_id) REFERENCES users(id)
     )
 	`
 	_, err = DB.Exec(createRegristrationTable)
